@@ -1,4 +1,3 @@
-using Zenject;
 
 namespace Profile
 {

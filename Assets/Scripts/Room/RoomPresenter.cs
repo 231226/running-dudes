@@ -1,4 +1,4 @@
-using Zenject;
+using VContainer;
 
 namespace Room
 {

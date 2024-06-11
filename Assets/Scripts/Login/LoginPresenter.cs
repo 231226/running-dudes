@@ -1,26 +1,30 @@
 using System;
-using Zenject;
+using MessagePipe;
+using UnityEngine;
+using VContainer;
+using VContainer.Unity;
 
 namespace Login
 {
-	public class LoginPresenter : IInitializable, IDisposable
+	public class LoginPresenter : IStartable, IDisposable
 	{
-		[Inject] private SignalBus _signalBus;
+		[Inject] private ISubscriber<string, Color> _subscriber;
+		private IDisposable _subscribers;
 		[Inject] private LoginView _view;
 
 		public void Dispose()
 		{
-			_signalBus.Unsubscribe<UserLoggedInSuccessfullySignal>(Smth);
+			_subscribers.Dispose();
 		}
 
-		public void Initialize()
+		public void Start()
 		{
-			_signalBus.Subscribe<UserLoggedInSuccessfullySignal>(Smth);
+			_subscribers = _subscriber.Subscribe(Constants.Keys.LoginResult, Smth);
 		}
 
-		private void Smth()
+		private void Smth(Color value)
 		{
-			_view.SetColor();
+			_view.SetColor(value);
 		}
 	}
 }

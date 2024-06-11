@@ -1,14 +1,21 @@
 using System.Threading.Tasks;
+using MessagePipe;
 using UnityEngine;
-using Zenject;
+using VContainer;
+using VContainer.Unity;
 
 namespace Login
 {
-	public class LoginService : IInitializable, IService
+	public class LoginService : IStartable, IService
 	{
-		[Inject] private SignalBus _signalBus;
+		[Inject] private IPublisher<string, Color> _publisher;
+		[Inject] private Color _color;
 
-		public void Initialize()
+		public void Log()
+		{
+		}
+
+		public void Start()
 		{
 			Login();
 		}
@@ -17,11 +24,7 @@ namespace Login
 		{
 			await Task.Delay(1000);
 			Debug.Log("FIRE");
-			_signalBus.Fire<UserLoggedInSuccessfullySignal>();
-		}
-
-		public void Log()
-		{
+			_publisher.Publish(Constants.Keys.LoginResult, _color);
 		}
 	}
 }
