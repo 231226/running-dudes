@@ -7,9 +7,9 @@ namespace Login
 	{
 		[SerializeField] private Image _image;
 		
-		public void SetColor()
+		public void SetColor(Color value)
 		{
-			_image.color = Color.green;
+			_image.color = value;
 		}
 	}
 }
