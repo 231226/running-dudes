@@ -10,6 +10,7 @@ public class MetaLifetimeScope : LifetimeScope
 	[SerializeField] private LoginView _loginView;
 	[SerializeField] private RoomView _roomView;
 	[SerializeField] private ProfileView _profileView;
+	[SerializeField] private PhotonService _photonService;
 
 	protected override void Configure(IContainerBuilder builder)
 	{
@@ -23,5 +24,6 @@ public class MetaLifetimeScope : LifetimeScope
 		builder.RegisterComponent(_loginView);
 		builder.RegisterComponent(_roomView);
 		builder.RegisterComponent(_profileView);
+		builder.RegisterComponent(_photonService);
 	}
 }
