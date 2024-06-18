@@ -1,4 +1,3 @@
-using Login;
 using MessagePipe;
 using UnityEngine;
 using VContainer;
@@ -12,8 +11,6 @@ public class ProjectLifetimeScope : LifetimeScope
 	{
 		var options = builder.RegisterMessagePipe();
 		builder.RegisterMessageBroker<string, Color>(options);
-
-		builder.RegisterEntryPoint<LoginService>().AsSelf();
 
 		builder.RegisterInstance(_color);
 	}
