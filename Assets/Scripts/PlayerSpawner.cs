@@ -7,6 +7,9 @@ public class PlayerSpawner : MonoBehaviour
 
 	private void Start()
 	{
-		PhotonNetwork.Instantiate(_prefabName, Vector3.zero, Quaternion.identity);
+		var randX = Random.Range(-5.0f, 5.0f);
+		var randZ = Random.Range(-5.0f, 5.0f);
+
+		PhotonNetwork.Instantiate(_prefabName, new Vector3(randX, 0.0f, randZ), Quaternion.identity);
 	}
 }
