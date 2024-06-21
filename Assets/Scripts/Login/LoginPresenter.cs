@@ -1,6 +1,7 @@
 using System;
+using System.Collections.Generic;
 using MessagePipe;
-using UnityEngine;
+using Photon.Realtime;
 using VContainer;
 using VContainer.Unity;
 
@@ -8,7 +9,7 @@ namespace Login
 {
 	public class LoginPresenter : IStartable, IDisposable
 	{
-		[Inject] private ISubscriber<string, Color> _subscriber;
+		[Inject] private ISubscriber<PhotonMessages, List<Player>> _subscriber;
 		private IDisposable _subscribers;
 		[Inject] private LoginView _view;
 
@@ -19,12 +20,12 @@ namespace Login
 
 		public void Start()
 		{
-			_subscribers = _subscriber.Subscribe(Constants.Keys.LoginResult, Smth);
+			_subscribers = _subscriber.Subscribe(PhotonMessages.Joined, Smth);
 		}
 
-		private void Smth(Color value)
+		private void Smth(List<Player> value)
 		{
-			_view.SetColor(value);
+			_view.SetVisible();
 		}
 	}
 }

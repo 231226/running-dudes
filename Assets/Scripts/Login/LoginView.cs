@@ -5,11 +5,9 @@ namespace Login
 {
 	public class LoginView : MonoBehaviour
 	{
-		[SerializeField] private Image _image;
-		
-		public void SetColor(Color value)
+		public void SetVisible()
 		{
-			_image.color = value;
+			gameObject.SetActive(false);
 		}
 	}
 }
