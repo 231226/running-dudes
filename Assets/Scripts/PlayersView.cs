@@ -16,7 +16,9 @@ public class PlayersView : MonoBehaviour
 
 		foreach (var player in players)
 		{
-			Instantiate(_view, _parent);
+			var view = Instantiate(_view, _parent);
+			view.SetNickname(player.NickName);
+			view.SetMaster(player.IsMasterClient);
 		}
 	}
 }
