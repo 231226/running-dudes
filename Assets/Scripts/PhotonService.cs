@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using ExitGames.Client.Photon;
 using MessagePipe;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine;
 using VContainer;
 
 public class PhotonService : MonoBehaviourPunCallbacks
@@ -11,6 +13,14 @@ public class PhotonService : MonoBehaviourPunCallbacks
 
 	private void Awake()
 	{
+		var rnd = Random.Range(0, 100000);
+		PhotonNetwork.NickName = $"Player {rnd}";
+		var stats = new Hashtable
+		{
+			["hp"] = Random.Range(80.0f, 100.0f)
+		};
+		PhotonNetwork.LocalPlayer.SetCustomProperties(stats);
+
 		PhotonNetwork.AutomaticallySyncScene = true;
 		PhotonNetwork.ConnectUsingSettings();
 	}
@@ -32,7 +42,7 @@ public class PhotonService : MonoBehaviourPunCallbacks
 		{
 			players.Add(pair.Value);
 		}
-		
+
 		_publisher.Publish(PhotonMessages.Joined, players);
 		_masterPublisher.Publish(PhotonMessages.MasterSwitched, PhotonNetwork.IsMasterClient);
 	}

@@ -1,18 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class PlayerItemView : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+	[SerializeField] private TMP_Text _nickname;
+	[SerializeField] private GameObject _masterIndicator;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+	public void SetNickname(string nickname)
+	{
+		_nickname.SetText(nickname);
+	}
+
+	public void SetMaster(bool isMaster)
+	{
+		_masterIndicator.SetActive(isMaster);
+	}
 }
