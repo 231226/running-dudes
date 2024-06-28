@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using ExitGames.Client.Photon;
 using MessagePipe;
@@ -5,24 +6,44 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 using VContainer;
+using Random = UnityEngine.Random;
 
 public class PhotonService : MonoBehaviourPunCallbacks
 {
 	[Inject] private IPublisher<PhotonMessages, bool> _masterPublisher;
 	[Inject] private IPublisher<PhotonMessages, List<Player>> _publisher;
+	[Inject] private ISubscriber<PlayFabMessages, string> _subscriber;
+
+	private IDisposable _ds;
 
 	private void Awake()
 	{
-		var rnd = Random.Range(0, 100000);
-		PhotonNetwork.NickName = $"Player {rnd}";
+		_ds = _subscriber.Subscribe(PlayFabMessages.NicknameChanged, NicknameChanged);
 		var stats = new Hashtable
 		{
 			["hp"] = Random.Range(80.0f, 100.0f)
 		};
 		PhotonNetwork.LocalPlayer.SetCustomProperties(stats);
-
 		PhotonNetwork.AutomaticallySyncScene = true;
-		PhotonNetwork.ConnectUsingSettings();
+	}
+
+	private void Connect()
+	{
+		if (!PhotonNetwork.IsConnected)
+		{
+			PhotonNetwork.ConnectUsingSettings();
+		}
+	}
+
+	private void NicknameChanged(string newNickname)
+	{
+		PhotonNetwork.NickName = newNickname;
+		Connect();
+	}
+
+	private void OnDestroy()
+	{
+		_ds.Dispose();
 	}
 
 	public override void OnConnectedToMaster()
