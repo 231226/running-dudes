@@ -14,6 +14,8 @@ public class ProjectLifetimeScope : LifetimeScope
 		var options = builder.RegisterMessagePipe();
 		builder.RegisterMessageBroker<PhotonMessages, List<Player>>(options);
 		builder.RegisterMessageBroker<PhotonMessages, bool>(options);
+		builder.RegisterMessageBroker<PlayFabMessages, string>(options);
 		builder.RegisterComponent(_photonService);
+		builder.RegisterEntryPoint<PlayFabService>().AsSelf();
 	}
 }
