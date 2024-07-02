@@ -22,5 +22,6 @@ public enum PhotonMessages
 
 public enum PlayFabMessages
 {
-	NicknameChanged
+	NicknameChanged,
+	InventoryReceived
 }

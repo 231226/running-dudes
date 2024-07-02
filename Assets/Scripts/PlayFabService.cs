@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using MessagePipe;
 using PlayFab;
 using PlayFab.ClientModels;
@@ -10,6 +11,7 @@ public class PlayFabService : IStartable
 {
 	private string _id;
 	[Inject] private IPublisher<PlayFabMessages, string> _publisher;
+	[Inject] private IPublisher<PlayFabMessages, List<ItemInstance>> _publisherInventory;
 
 	public void Start()
 	{
@@ -61,10 +63,75 @@ public class PlayFabService : IStartable
 			PlayFabId = obj.PlayFabId
 		};
 		PlayFabClientAPI.GetPlayerProfile(request, ResultCallback, ErrorCallback);
+		PlayFabClientAPI.GetUserInventory(new GetUserInventoryRequest(),
+			result => { _publisherInventory.Publish(PlayFabMessages.InventoryReceived, result.Inventory); },
+			ErrorCallback);
+
+		// CreateNewCharacter();
+
+		PlayFabClientAPI.AddUserVirtualCurrency(new AddUserVirtualCurrencyRequest
+		{
+			Amount = 100, VirtualCurrency = "SC"
+		}, result => { }, ErrorCallback);
 	}
 
 	private void ResultCallback(GetPlayerProfileResult obj)
 	{
 		_publisher.Publish(PlayFabMessages.NicknameChanged, obj.PlayerProfile.DisplayName);
+
+		var request = new GetStoreItemsRequest
+		{
+			CatalogVersion = "1.0",
+			StoreId = "main_store"
+		};
+		//PlayFabClientAPI.GetStoreItems(request, ResultCallback, ErrorCallback);
+	}
+
+	private void ResultCallback(GetStoreItemsResult obj)
+	{
+		foreach (var item in obj.Store)
+		{
+			Debug.Log(item.ItemId);
+		}
+
+		var request = new PurchaseItemRequest
+		{
+			CatalogVersion = "1.0",
+			ItemId = obj.Store[0].ItemId,
+			Price = (int)obj.Store[0].VirtualCurrencyPrices["SC"],
+			VirtualCurrency = "SC"
+		};
+
+		//PlayFabClientAPI.PurchaseItem(request, ResultCallback, ErrorCallback);
+	}
+
+	private void ResultCallback(PurchaseItemResult obj)
+	{
+	}
+
+	private void CreateNewCharacter()
+	{
+		PlayFabClientAPI.GetStoreItems(new GetStoreItemsRequest
+		{
+			CatalogVersion = "1.0",
+			StoreId = "main_store"
+		}, result =>
+		{
+			PlayFabClientAPI.PurchaseItem(new PurchaseItemRequest
+			{
+				CatalogVersion = "1.0",
+				ItemId = "hero_token",
+				Price = 1,
+				VirtualCurrency = "TP"
+			}, itemResult =>
+			{
+				PlayFabClientAPI.GrantCharacterToUser(new GrantCharacterToUserRequest
+				{
+					CatalogVersion = "1.0",
+					ItemId = itemResult.Items[0].ItemId,
+					CharacterName = "Conan"
+				}, characterResult => { Debug.Log($"MAX SUCCESS! {characterResult.CharacterId}"); }, ErrorCallback);
+			}, ErrorCallback);
+		}, ErrorCallback);
 	}
 }
