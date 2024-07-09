@@ -21,6 +21,9 @@ public class MetaLifetimeScope : LifetimeScope
 		builder.Register<ProfilePresenter>(Lifetime.Singleton);
 		builder.RegisterEntryPoint<RoomPresenter>();
 		builder.RegisterEntryPoint<LoginPresenter>();
+		builder.RegisterEntryPoint<InventoryPresenter>();
+
+		builder.Register<InventoryModel>(Lifetime.Singleton);
 
 		builder.RegisterComponent(_loginView);
 		builder.RegisterComponent(_roomView);

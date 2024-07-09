@@ -11,10 +11,9 @@ public class PlayerSpawner : MonoBehaviour
 		var randX = Random.Range(-5.0f, 5.0f);
 		var randZ = Random.Range(-5.0f, 5.0f);
 		
-		
-
 		var go = PhotonNetwork.Instantiate(_prefabName, new Vector3(randX, 0.0f, randZ), Quaternion.identity);
 		var comp = go.GetComponent<CylinderPlayer>();
+		var meshRenderer = go.GetComponent<MeshRenderer>();
 
 		float hp;
 		PhotonNetwork.LocalPlayer.CustomProperties.TryGetValue("hp", out hp);

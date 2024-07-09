@@ -4,27 +4,35 @@ using ExitGames.Client.Photon;
 using MessagePipe;
 using Photon.Pun;
 using Photon.Realtime;
-using UnityEngine;
 using VContainer;
 using Random = UnityEngine.Random;
 
 public class PhotonService : MonoBehaviourPunCallbacks
 {
+	private IDisposable _ds1;
+	private IDisposable _ds2;
+
 	[Inject] private IPublisher<PhotonMessages, bool> _masterPublisher;
 	[Inject] private IPublisher<PhotonMessages, List<Player>> _publisher;
 	[Inject] private ISubscriber<PlayFabMessages, string> _subscriber;
 
-	private IDisposable _ds;
-
 	private void Awake()
 	{
-		_ds = _subscriber.Subscribe(PlayFabMessages.NicknameChanged, NicknameChanged);
+		_ds1 = _subscriber.Subscribe(PlayFabMessages.NicknameChanged, NicknameChanged);
+		_ds2 = _subscriber.Subscribe(PlayFabMessages.SkinChanged, SetSkin);
 		var stats = new Hashtable
 		{
-			["hp"] = Random.Range(80.0f, 100.0f)
+			["hp"] = Random.Range(80.0f, 100.0f),
+			["skin"] = "road"
 		};
 		PhotonNetwork.LocalPlayer.SetCustomProperties(stats);
 		PhotonNetwork.AutomaticallySyncScene = true;
+	}
+
+	private void OnDestroy()
+	{
+		_ds1.Dispose();
+		_ds2.Dispose();
 	}
 
 	private void Connect()
@@ -39,11 +47,6 @@ public class PhotonService : MonoBehaviourPunCallbacks
 	{
 		PhotonNetwork.NickName = newNickname;
 		Connect();
-	}
-
-	private void OnDestroy()
-	{
-		_ds.Dispose();
 	}
 
 	public override void OnConnectedToMaster()
@@ -93,5 +96,14 @@ public class PhotonService : MonoBehaviourPunCallbacks
 	public override void OnMasterClientSwitched(Player newMasterClient)
 	{
 		_masterPublisher.Publish(PhotonMessages.MasterSwitched, PhotonNetwork.IsMasterClient);
+	}
+
+	public void SetSkin(string id)
+	{
+		var stats = new Hashtable
+		{
+			["skin"] = id
+		};
+		PhotonNetwork.LocalPlayer.SetCustomProperties(stats);
 	}
 }

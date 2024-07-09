@@ -58,33 +58,48 @@ public class PlayFabService : IStartable
 	private void ResultCallback(LoginResult obj)
 	{
 		Save(_id);
-		var request = new GetPlayerProfileRequest
+
+		var profileRequest = new GetPlayerProfileRequest
 		{
 			PlayFabId = obj.PlayFabId
 		};
-		PlayFabClientAPI.GetPlayerProfile(request, ResultCallback, ErrorCallback);
-		PlayFabClientAPI.GetUserInventory(new GetUserInventoryRequest(),
-			result => { _publisherInventory.Publish(PlayFabMessages.InventoryReceived, result.Inventory); },
-			ErrorCallback);
+		PlayFabClientAPI.GetPlayerProfile(profileRequest, ResultCallback, ErrorCallback);
+
+		var inventoryRequest = new GetUserInventoryRequest();
+		PlayFabClientAPI.GetUserInventory(inventoryRequest, ResultCallback, ErrorCallback);
 
 		// CreateNewCharacter();
+	}
 
-		PlayFabClientAPI.AddUserVirtualCurrency(new AddUserVirtualCurrencyRequest
-		{
-			Amount = 100, VirtualCurrency = "SC"
-		}, result => { }, ErrorCallback);
+	private void ResultCallback(GetUserInventoryResult obj)
+	{
+		_publisherInventory.Publish(PlayFabMessages.InventoryReceived, obj.Inventory);
 	}
 
 	private void ResultCallback(GetPlayerProfileResult obj)
 	{
 		_publisher.Publish(PlayFabMessages.NicknameChanged, obj.PlayerProfile.DisplayName);
 
-		var request = new GetStoreItemsRequest
+		var dataRequest = new GetUserDataRequest
 		{
-			CatalogVersion = "1.0",
-			StoreId = "main_store"
+			PlayFabId = obj.PlayerProfile.PlayerId
 		};
+		PlayFabClientAPI.GetUserData(dataRequest, ResultCallback, ErrorCallback);
+
+		// var request = new GetStoreItemsRequest
+		// {
+		// 	CatalogVersion = "1.0",
+		// 	StoreId = "main_store"
+		// };
 		//PlayFabClientAPI.GetStoreItems(request, ResultCallback, ErrorCallback);
+	}
+
+	private void ResultCallback(GetUserDataResult obj)
+	{
+		if (obj.Data.TryGetValue("skin", out UserDataRecord record))
+		{
+			_publisher.Publish(PlayFabMessages.SkinChanged, record.Value);
+		}
 	}
 
 	private void ResultCallback(GetStoreItemsResult obj)
@@ -133,5 +148,21 @@ public class PlayFabService : IStartable
 				}, characterResult => { Debug.Log($"MAX SUCCESS! {characterResult.CharacterId}"); }, ErrorCallback);
 			}, ErrorCallback);
 		}, ErrorCallback);
+	}
+
+	public void SetSkin(string id)
+	{
+		var request = new UpdateUserDataRequest
+		{
+			Data = new Dictionary<string, string>
+			{
+				["skin"] = id
+			}
+		};
+		PlayFabClientAPI.UpdateUserData(request, ResultCallback, ErrorCallback);
+	}
+
+	private void ResultCallback(UpdateUserDataResult obj)
+	{
 	}
 }
