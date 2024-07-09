@@ -11,6 +11,7 @@ public class MetaLifetimeScope : LifetimeScope
 	[SerializeField] private RoomView _roomView;
 	[SerializeField] private ProfileView _profileView;
 	[SerializeField] private PlayersView _playersView;
+	[SerializeField] private InventoryView _inventoryView;
 
 	protected override void Configure(IContainerBuilder builder)
 	{
@@ -20,10 +21,14 @@ public class MetaLifetimeScope : LifetimeScope
 		builder.Register<ProfilePresenter>(Lifetime.Singleton);
 		builder.RegisterEntryPoint<RoomPresenter>();
 		builder.RegisterEntryPoint<LoginPresenter>();
+		builder.RegisterEntryPoint<InventoryPresenter>();
+
+		builder.Register<InventoryModel>(Lifetime.Singleton);
 
 		builder.RegisterComponent(_loginView);
 		builder.RegisterComponent(_roomView);
 		builder.RegisterComponent(_profileView);
 		builder.RegisterComponent(_playersView);
+		builder.RegisterComponent(_inventoryView);
 	}
 }

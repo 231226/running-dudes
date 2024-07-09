@@ -4,6 +4,7 @@ using UnityEngine;
 public class CylinderPlayer : MonoBehaviour, IPunObservable
 {
 	[SerializeField] private float _speed;
+	[SerializeField] private SkinList _skins;
 
 	private float _health;
 
@@ -14,6 +15,14 @@ public class CylinderPlayer : MonoBehaviour, IPunObservable
 	{
 		_mr = GetComponent<MeshRenderer>();
 		_pv = GetComponent<PhotonView>();
+		
+		if (_pv.Controller.CustomProperties.TryGetValue("skin", out var id))
+		{
+			if (id is string value)
+			{
+				_mr.material = _skins.GetMaterialById(value);
+			}
+		}
 	}
 
 	private void Update()
